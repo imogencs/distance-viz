@@ -39,7 +39,7 @@ var path = svg.append("path")
 
 
 
-d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/processed.csv?token=GHSAT0AAAAAABWYAQZTRMGHNCKG34X4OQGWYW4MULA", function(distanceData) {
+d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/processed.csv?token=GHSAT0AAAAAABWYAQZTIVNLZQEDD3SU7SISYW4OVAA", function(distanceData) {
 
     console.log(distanceData)
 
@@ -59,7 +59,7 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
     // yScale for the bar height
     var yScale = d3.scaleLinear()
         .domain([0, d3.max(distanceData, function(d) {
-            return d.distance;
+            return d.log_distance;
         })])
         .range([0, (r / numSpirals) - 30]);
 
@@ -90,7 +90,7 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
             return barWidth;
         })
         .attr("height", function(d) {
-            return yScale(d.distance);
+            return yScale(d.log_distance);
         })
         .style("fill", "steelblue")
         .style("stroke", "none")
