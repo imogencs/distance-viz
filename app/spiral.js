@@ -39,8 +39,14 @@ var path = svg.append("path")
 
 
 
-d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/processed.csv?token=GHSAT0AAAAAABWYAQZTIVNLZQEDD3SU7SISYW4OVAA", function(distanceData) {
+d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/processed.csv", function(distanceData) {
 
+    console.log(distanceData)
+
+    console.log(distanceData.date)
+    distanceData.date = distanceData.date.map(date => new Date(date))
+
+    console.log('did the date parse')
     console.log(distanceData)
 
 
