@@ -3,18 +3,46 @@
 
 <head>
     <script data-require="d3@4.0.0" data-semver="4.0.0" src="https://d3js.org/d3.v4.js"></script>
-
-    <style src='style.css'></style>
-
-    <!-- <script src='https://d3js.org/d3.v4.min.js'></script> -->
 </head>
 
 <body>
-    <h1>its for my bby</h1>
-
+    <style>
+        body {
+            font-family: Sans-serif;
+            font-size: 11px;
+            background-color: navy;
+        }
+        
+        .slice {
+            cursor: pointer;
+        }
+        
+        .slice .main-arc {
+            stroke: #fff;
+            stroke-width: 1px;
+        }
+        
+        .slice .hidden-arc {
+            fill: none;
+        }
+        
+        .slice text {
+            pointer-events: none;
+            dominant-baseline: middle;
+            text-anchor: middle;
+        }
+        
+        .highlight {
+            background: #2bff00;
+        }
+        
+        .h1 {
+            text-align: center;
+        }
+    </style>
+    <h1>distance viz</h1>
     <div id="chart"></div>
     <script defer src='./spiral.js'></script>
-
 </body>
 
 

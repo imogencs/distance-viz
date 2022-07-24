@@ -33,8 +33,9 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
     var barstrokecolor = 'black'
     var imocolor = 'magenta'
     var jwucolor = 'blue'
-    var backgroundcolor = 'blue'
-    var svgcolor = 'navy'
+    var backgroundRectColor = 'blue'
+    var backgroundcolor = 'navy'
+    var textcolor = 'blueviolet'
 
 
     var width = 1200,
@@ -57,13 +58,8 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
         .attr("width", width)
         .attr("height", height)
         .append("g")
-        .attr('fill', svgcolor)
         .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-
-    // var background = svg.append('rect')
-    //     .attr('fill', svgcolor)
-    //     .attr('x', 0)
 
     ////////////////
     // the spiral //
@@ -82,15 +78,12 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
         .attr("id", "spiral")
         .attr("d", spiral)
         .style("fill", 'none')
-        .style("stroke", "white"); // TODO change spiral color
+        .style("stroke", backgroundcolor); // TODO change spiral color
 
 
     ////////////////////////
     // the bars and stuff // 
     ////////////////////////
-
-    console.log(distanceData)
-
 
     // TODO update length to account for different bar widths
     var spiralLength = path.node().getTotalLength(),
@@ -113,6 +106,45 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
 
     var rect_radius = 0
     var gfRectHeight = 2
+
+    // append white base rects
+    svg.selectAll("baserect")
+        .data(distanceData)
+        .enter()
+        .append("rect")
+        .attr('rx', rect_radius)
+        .attr('ry', rect_radius)
+        .attr("x", function(d, i) {
+
+            // placement calculations
+            var linePer = timeScale(d.date),
+                posOnLine = path.node().getPointAtLength(linePer),
+                angleOnLine = path.node().getPointAtLength(linePer - barWidth);
+
+            d.linePer = linePer; // % distance are on the spiral
+            d.x = posOnLine.x; // x postion on the spiral
+            d.y = posOnLine.y; // y position on the spiral
+
+            d.a = (Math.atan2(angleOnLine.y, angleOnLine.x) * 180 / Math.PI) - 90; //angle at the spiral position
+
+            return d.x;
+        })
+        .attr("y", function(d) {
+            return d.y;
+        })
+        .attr("width", function(d) {
+            return barWidth;
+        })
+        .attr("height", function(d) {
+            return Math.max(yScale(d.log_distance), gfRectHeight);
+        })
+        .style("fill", 'white')
+        // .style('opacity', .4)
+        .attr("transform", function(d) {
+            return "rotate(" + d.a + "," + d.x + "," + d.y + ")"; // rotate the bar
+        })
+        .attr('id', 'baserect');
+
 
     // append imo rects
     svg.selectAll("imorect")
@@ -148,7 +180,7 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
         .style("fill", imocolor)
         .style("stroke", barstrokecolor)
         .style('stroke-width', .1)
-        .style('opacity', .4)
+        // .style('opacity', .4)
         .attr("transform", function(d) {
             return "rotate(" + d.a + "," + d.x + "," + d.y + ")"; // rotate the bar
         })
@@ -223,8 +255,8 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
         .attr("height", function(d) {
             return Math.max(yScale(d.log_distance) - gfRectHeight, 0);
         })
-        .style("fill", backgroundcolor)
-        .style('opacity', .05)
+        .style("fill", backgroundRectColor)
+        // .style('opacity', .5)
         .attr("transform", function(d) {
             return "rotate(" + d.a + "," + d.x + "," + d.y + ")"; // rotate the bar
         })
@@ -266,58 +298,13 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
 
         })
         .style("fill", jwucolor)
-        .style('opacity', .3)
+        // .style('opacity', .3)
         .attr("transform", function(d) {
             return "rotate(" + d.a + "," + d.x + "," + d.y + ")"; // rotate the bar
         })
         .attr('id', 'jwurect');
 
 
-
-    // //////////////////////
-    // // append imo rects //
-    // //////////////////////
-
-    // svg.selectAll("imorect")
-    //     .data(distanceData)
-    //     .enter()
-    //     .append("rect")
-    //     .attr('rx', rect_radius)
-    //     .attr('ry', rect_radius)
-    //     .attr("x", function(d, i) {
-
-    //         // placement calculations
-    //         var linePer = timeScale(d.date),
-    //             posOnLine = path.node().getPointAtLength(linePer),
-    //             angleOnLine = path.node().getPointAtLength(linePer - barWidth);
-
-    //         d.linePer = linePer; // % distance are on the spiral
-    //         d.x = posOnLine.x; // x postion on the spiral
-    //         d.y = posOnLine.y; // y position on the spiral
-
-    //         d.a = (Math.atan2(angleOnLine.y, angleOnLine.x) * 180 / Math.PI) - 90; //angle at the spiral position
-
-    //         return d.x;
-    //     })
-    //     .attr("y", function(d) {
-    //         return d.y;
-    //     })
-    //     .attr("width", function(d) {
-    //         return barWidth;
-    //     })
-    //     .attr("height", function(d) {
-    //         return gfRectHeight;
-    //     })
-    //     .style("fill", imocolor)
-    //     .style('opacity', .3)
-    //     .attr("transform", function(d) {
-    //         console.log('cos of ' + ((d.a * Math.PI / 180) % 1) + ' = ' + Math.acos((d.a * Math.PI / 180) % 1))
-    //         var hypotenuse = yScale(d.log_distance)
-    //         var deltaX = hypotenuse * (Math.acos((d.a * Math.PI / 180) % 1))
-    //         var deltaY = hypotenuse * (Math.asin((d.a * Math.PI / 180) % 1))
-    //         return 'translate(' + deltaX + ' ' + deltaY + ')rotate(' + d.a + ',' + d.x + ',' + d.y + ')'; // rotate the bar
-    //     })
-    //     .attr('id', 'imorect');
 
     // add date labels
     var tF = d3.timeFormat("%b %Y"),
@@ -344,7 +331,7 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
         })
         // place text along spiral
         .attr("xlink:href", "#spiral")
-        .style("fill", "grey")
+        .style("fill", textcolor)
         .attr("startOffset", function(d) {
             return ((d.linePer / spiralLength) * 100) + "%";
         })
