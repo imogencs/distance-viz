@@ -37,11 +37,12 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
     var backgroundRectColor = 'DarkBlue'
     var backgroundcolor = 'navy'
     var textcolor = 'blueviolet'
+    var boxcolor = 'darkblue'
 
     var rect_radius = 2
     var gfRectHeight = 3
         // var gfOpacity = .7
-    var jwuOpacity = .5
+    var jwuOpacity = .7
     var imoOpacity = .7
 
 
@@ -158,6 +159,68 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
     //     })
     //     .attr('id', 'baserect');
 
+    function drawInfobox(d) {
+
+        var boxwidth = 100
+        var x = -1 * width / 2
+        var y = -1 * height / 2
+        var cornerRadius = 4
+        var lineSpacing = 20
+        var margin = 20
+
+        svg.append('text')
+            .attr('x', x + margin)
+            .attr('y', y + lineSpacing * 2)
+            .text(d.pretty_date)
+            .attr('id', 'date')
+        svg.append('text')
+            .attr('x', x + margin)
+            .attr('y', y + lineSpacing * 3)
+            .text(d.description)
+            .attr('id', 'title')
+
+        // our individual locations
+        svg.append('text')
+            .attr('x', x + barWidth * 1.5 + margin)
+            .attr('y', y + lineSpacing * 4)
+            .text("Jwu: " + d.jwu)
+            .attr('id', 'jwuLoc')
+        svg.append('text')
+            .attr('x', x + barWidth * 1.5 + margin)
+            .attr('y', y + lineSpacing * 5)
+            .text("Imo: " + d.imo)
+            .attr('id', 'imoLoc')
+
+        // "key" I guess
+        svg.append('rect')
+            .attr('x', x + margin)
+            .attr('y', y + lineSpacing * 3.5 + gfRectHeight / 2)
+            .attr('fill', jwucolor)
+            .attr('rx', rect_radius)
+            .attr('height', gfRectHeight)
+            .attr('width', barWidth)
+            .attr('opacity', jwuOpacity)
+            .attr('id', 'jwuKey')
+        svg.append('rect')
+            .attr('x', x + margin)
+            .attr('y', y + lineSpacing * 4.5 + gfRectHeight / 2)
+            .attr('fill', imocolor)
+            .attr('rx', rect_radius)
+            .attr('height', gfRectHeight)
+            .attr('width', barWidth)
+            .attr('opacity', imoOpacity)
+            .attr('id', 'imoKey')
+
+    }
+
+    function eraseInfobox() {
+        d3.select('#date').remove()
+        d3.select('#title').remove()
+        d3.select('#jwuLoc').remove()
+        d3.select('#imoLoc').remove()
+        d3.select('#jwuKey').remove()
+        d3.select('#imoKey').remove()
+    }
 
     // ---------------- // 
     // append imo rects //
@@ -198,6 +261,11 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
         .style('opacity', imoOpacity)
         .attr("transform", function(d) {
             return "rotate(" + d.a + "," + d.x + "," + d.y + ")"; // rotate the bar
+        })
+        .attr('id', 'backrgoundrect')
+        .on('mouseover', function(d) {
+            eraseInfobox()
+            drawInfobox(d)
         })
         .attr('id', 'imorect');
 
@@ -259,7 +327,8 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
         })
         .attr('id', 'backrgoundrect')
         .on('mouseover', function(d) {
-
+            eraseInfobox()
+            drawInfobox(d)
         });
 
 
@@ -285,7 +354,6 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
         .attr("height", function(d) {
             // return Math.min(barWidth, yScale(d.log_distance));
             return gfRectHeight;
-
         })
         .style("fill", function(d) {
             if (yScale(d.log_distance) < gfRectHeight) {
@@ -305,6 +373,11 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
         })
         .attr("transform", function(d) {
             return "rotate(" + d.a + "," + d.x + "," + d.y + ")"; // rotate the bar
+        })
+        .attr('id', 'backrgoundrect')
+        .on('mouseover', function(d) {
+            eraseInfobox()
+            drawInfobox(d)
         })
         .attr('id', 'jwurect');
 
