@@ -31,17 +31,18 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
 
     var barcolor = 'none'
     var barstrokecolor = 'none'
-    var imocolor = 'orchid'
+    var imocolor = 'magenta'
     var jwucolor = 'deepskyblue'
+    var togethercolor = '#8800DD'
     var backgroundRectColor = 'DarkBlue'
     var backgroundcolor = 'navy'
     var textcolor = 'blueviolet'
 
-    var rect_radius = 0
-    var gfRectHeight = 2
+    var rect_radius = 2
+    var gfRectHeight = 3
         // var gfOpacity = .7
     var jwuOpacity = .5
-    var imoOpacity = .6
+    var imoOpacity = .7
 
 
     var width = 1200,
@@ -236,8 +237,8 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
         .data(distanceData)
         .enter()
         .append("rect")
-        .attr('rx', rect_radius)
-        .attr('ry', rect_radius)
+        // .attr('rx', rect_radius)
+        // .attr('ry', rect_radius)
         .attr("x", function(d, i) {
             return d.x;
         })
@@ -256,7 +257,10 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
         .attr("transform", function(d) {
             return "rotate(" + d.a + "," + d.x + "," + d.y + ")"; // rotate the bar
         })
-        .attr('id', 'backrgoundrect');
+        .attr('id', 'backrgoundrect')
+        .on('mouseover', function(d) {
+
+        });
 
 
     // ---------------- // 
@@ -283,44 +287,58 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
             return gfRectHeight;
 
         })
-        .style("fill", jwucolor)
-        .style('opacity', jwuOpacity)
+        .style("fill", function(d) {
+            if (yScale(d.log_distance) < gfRectHeight) {
+                // if this is an overlap case aka we were together
+                return togethercolor
+            } else {
+                return jwucolor
+            }
+        })
+        .style('opacity', function(d) {
+            if (yScale(d.log_distance) < gfRectHeight) {
+                // if this is an overlap case aka we were together
+                return 1
+            } else {
+                return jwuOpacity
+            }
+        })
         .attr("transform", function(d) {
             return "rotate(" + d.a + "," + d.x + "," + d.y + ")"; // rotate the bar
         })
         .attr('id', 'jwurect');
 
 
-    /////////////////////
-    // add date labels // 
-    /////////////////////
+    // /////////////////////
+    // // add date labels // 
+    // /////////////////////
 
-    var tF = d3.timeFormat("%b %Y"),
-        firstInMonth = {};
-    svg.selectAll("text")
-        .data(distanceData)
-        .enter()
-        .append("text")
-        .attr("dy", 10)
-        .style("text-anchor", "start")
-        .style("font", "10px arial")
-        .append("textPath")
-        // only add for the first of each month
-        .filter(function(d) {
-            var sd = tF(d.date);
-            if (!firstInMonth[sd]) {
-                firstInMonth[sd] = 1;
-                return true;
-            }
-            return false;
-        })
-        .text(function(d) {
-            return tF(d.date);
-        })
-        // place text along spiral
-        .attr("xlink:href", "#spiral")
-        .style("fill", textcolor)
-        .attr("startOffset", function(d) {
-            return ((d.linePer / spiralLength) * 100) + "%";
-        })
+    // var tF = d3.timeFormat("%b %Y"),
+    //     firstInMonth = {};
+    // svg.selectAll("text")
+    //     .data(distanceData)
+    //     .enter()
+    //     .append("text")
+    //     .attr("dy", 10)
+    //     .style("text-anchor", "start")
+    //     .style("font", "10px arial")
+    //     .append("textPath")
+    //     // only add for the first of each month
+    //     .filter(function(d) {
+    //         var sd = tF(d.date);
+    //         if (!firstInMonth[sd]) {
+    //             firstInMonth[sd] = 1;
+    //             return true;
+    //         }
+    //         return false;
+    //     })
+    //     .text(function(d) {
+    //         return tF(d.date);
+    //     })
+    //     // place text along spiral
+    //     .attr("xlink:href", "#spiral")
+    //     .style("fill", textcolor)
+    //     .attr("startOffset", function(d) {
+    //         return ((d.linePer / spiralLength) * 100) + "%";
+    //     })
 })
