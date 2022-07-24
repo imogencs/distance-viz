@@ -1,7 +1,16 @@
 // adapted from http://bl.ocks.org/larsenmtl/222043d93a41d48b58d2bfa1e3d4f708 for jyalu <3
 
-var width = 500,
-    height = 500,
+
+//////////////////////////////////////
+// some boring constants and stuff // 
+/////////////////////////////////////
+
+var barcolor = 'lightblue'
+var imocolor = 'lightpurple'
+var jyalucolor = 'lightgreen'
+
+var width = 1000,
+    height = 1000,
     start = 0,
     end = 2.25,
     numSpirals = 4;
@@ -38,23 +47,31 @@ var path = svg.append("path")
     .style("stroke", "skyblue");
 
 
-// var parseTime = d3.timeParse("Tue, %MMM %dd, %YY");
+var rowConverter = function(d) {
+    // Just gotta get a date that's not a string lol
+    return {
+        date: new Date(d.year, d.month - 1, d.day),
+        pretty_date: d.pretty_date,
+        imo: d.imo,
+        jwu: d.jwu,
+        description: d.description,
+        year: d.year,
+        month: d.month,
+        day: d.day,
+        day_int: d.day_int,
+        imo_lat: d.imo_lat,
+        imo_lon: d.imo_lon,
+        jwu_lat: d.jwu_lat,
+        jwu_lon: d.jwu_lon,
+        distance: d.distance,
+        log_distance: d.log_distance,
+        extra_log_distance: Math.log(d.log_distance + 1) - 1
+    };
+}
 
-// var rowConverter = function(d) {
-//     return {
-//         year: parseTime(d.year),
-//         population: +d.population
-//     };
-// }
-// d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/processed.csv", rowConverter).then(function(distanceData) {
-d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/processed.csv", function(distanceData) {
 
-    console.log(distanceData)
+d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/processed.csv", rowConverter, function(distanceData) {
 
-    // console.log(distanceData.date)
-    // distanceData.date = distanceData.date.map(date => new Date(date))
-
-    console.log('did the date parse')
     console.log(distanceData)
 
 
@@ -73,7 +90,7 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
     // yScale for the bar height
     var yScale = d3.scaleLinear()
         .domain([0, d3.max(distanceData, function(d) {
-            return d.log_distance;
+            return d.extra_log_distance;
         })])
         .range([0, (r / numSpirals) - 30]);
 
@@ -104,9 +121,9 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
             return barWidth;
         })
         .attr("height", function(d) {
-            return yScale(d.log_distance);
+            return yScale(d.extra_log_distance);
         })
-        .style("fill", "steelblue")
+        .style("fill", barcolor)
         .style("stroke", "none")
         .attr("transform", function(d) {
             return "rotate(" + d.a + "," + d.x + "," + d.y + ")"; // rotate the bar
