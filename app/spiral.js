@@ -1,3 +1,8 @@
+///////////////////////////////////
+// spiral dataviz for my darling // 
+///////////////////////////////////
+
+
 // adapted from http://bl.ocks.org/larsenmtl/222043d93a41d48b58d2bfa1e3d4f708 for jyalu <3
 
 
@@ -19,34 +24,6 @@ var theta = function(r) {
     return numSpirals * Math.PI * r;
 };
 
-var r = d3.min([width, height]) / 2 - 40;
-
-var radius = d3.scaleLinear()
-    .domain([start, end])
-    .range([40, r]);
-
-var svg = d3.select("#chart").append("svg")
-    .attr("width", width)
-    .attr("height", height)
-    .append("g")
-    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-// create the spiral, borrowed from http://bl.ocks.org/syntagmatic/3543186
-var points = d3.range(start, end + 0.001, (end - start) / 1000);
-
-var spiral = d3.radialLine()
-    .curve(d3.curveCardinal)
-    .angle(theta)
-    .radius(radius);
-
-var path = svg.append("path")
-    .datum(points)
-    .attr("id", "spiral")
-    .attr("d", spiral)
-    .style("fill", "none")
-    .style("stroke", "skyblue");
-
-
 var rowConverter = function(d) {
     // Just gotta get a date that's not a string lol
     return {
@@ -64,11 +41,47 @@ var rowConverter = function(d) {
         jwu_lat: d.jwu_lat,
         jwu_lon: d.jwu_lon,
         distance: d.distance,
-        log_distance: d.log_distance,
-        extra_log_distance: Math.log(d.log_distance + 1) - 1
+        log_distance: d.log_distance
     };
 }
 
+var r = d3.min([width, height]) / 2 - 100;
+
+var radius = d3.scaleLinear()
+    .domain([start, end])
+    .range([40, r]);
+
+var svg = d3.select("#chart").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+
+
+////////////////
+// the spiral //
+//////////////// 
+
+// borrowed from http://bl.ocks.org/syntagmatic/3543186
+var points = d3.range(start, end + 0.001, (end - start) / 1000);
+
+var spiral = d3.radialLine()
+    .curve(d3.curveCardinal)
+    .angle(theta)
+    .radius(radius);
+
+var path = svg.append("path")
+    .datum(points)
+    .attr("id", "spiral")
+    .attr("d", spiral)
+    .style("fill", "none")
+    .style("stroke", "white"); // TODO change spiral color
+
+
+////////////////////////
+// the bars and stuff // 
+////////////////////////
 
 d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/processed.csv", rowConverter, function(distanceData) {
 
@@ -90,15 +103,19 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
     // yScale for the bar height
     var yScale = d3.scaleLinear()
         .domain([0, d3.max(distanceData, function(d) {
-            return d.extra_log_distance;
+            return d.log_distance;
         })])
         .range([0, (r / numSpirals) - 30]);
+
+    var rect_radius = 4
 
     // append rects
     svg.selectAll("rect")
         .data(distanceData)
         .enter()
         .append("rect")
+        .attr('rx', rect_radius)
+        .attr('ry', rect_radius)
         .attr("x", function(d, i) {
 
             // placement calculations
@@ -121,10 +138,11 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
             return barWidth;
         })
         .attr("height", function(d) {
-            return yScale(d.extra_log_distance);
+            return yScale(d.log_distance);
         })
         .style("fill", barcolor)
-        .style("stroke", "none")
+        .style("stroke", barcolor)
+        .style('stroke-width', 1)
         .attr("transform", function(d) {
             return "rotate(" + d.a + "," + d.x + "," + d.y + ")"; // rotate the bar
         });
