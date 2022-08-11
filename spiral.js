@@ -69,7 +69,7 @@ d3.csv("https://raw.githubusercontent.com/imogencs/distance-viz/main/data/proces
     var width = 1200,
         height = 1000,
         start = 0,
-        end = 3,
+        end = 3.05,
         numSpirals = 4;
 
     var theta = function(r) {
